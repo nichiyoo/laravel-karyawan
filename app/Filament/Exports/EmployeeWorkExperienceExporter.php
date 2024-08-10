@@ -14,24 +14,23 @@ class EmployeeWorkExperienceExporter extends Exporter
     public static function getColumns(): array
     {
         return [
-            ExportColumn::make('id')
-                ->label('ID'),
-            ExportColumn::make('created_at'),
-            ExportColumn::make('updated_at'),
-            ExportColumn::make('company_name'),
-            ExportColumn::make('position'),
-            ExportColumn::make('start_date'),
-            ExportColumn::make('end_date'),
-            ExportColumn::make('employee.name'),
+            ExportColumn::make('id')->label('ID'),
+            ExportColumn::make('created_at')->label('Tanggal Dibuat'),
+            ExportColumn::make('updated_at')->label('Tanggal Diubah'),
+            ExportColumn::make('company_name')->label('Nama Perusahaan'),
+            ExportColumn::make('position')->label('Jabatan'),
+            ExportColumn::make('start_date')->label('Tanggal Mulai'),
+            ExportColumn::make('end_date')->label('Tanggal Selesai'),
+            ExportColumn::make('employee.name')->label('Nama Karyawan'),
         ];
     }
 
     public static function getCompletedNotificationBody(Export $export): string
     {
-        $body = 'Your employee work experience export has completed and ' . number_format($export->successful_rows) . ' ' . str('row')->plural($export->successful_rows) . ' exported.';
+        $body = 'Export data riwayat kerja karyawan anda telah selesai dan ' . number_format($export->successful_rows) . ' ' . str('row')->plural($export->successful_rows) . ' telah diexport.';
 
         if ($failedRowsCount = $export->getFailedRowsCount()) {
-            $body .= ' ' . number_format($failedRowsCount) . ' ' . str('row')->plural($failedRowsCount) . ' failed to export.';
+            $body .= ' ' . number_format($failedRowsCount) . ' ' . str('row')->plural($failedRowsCount) . ' gagal diexport.';
         }
 
         return $body;

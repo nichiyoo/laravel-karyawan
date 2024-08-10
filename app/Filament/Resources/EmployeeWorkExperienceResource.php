@@ -59,11 +59,13 @@ class EmployeeWorkExperienceResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('created_at')
+                    ->label('Tanggal Dibuat')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 Tables\Columns\TextColumn::make('updated_at')
+                    ->label('Tanggal Diubah')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -77,14 +79,17 @@ class EmployeeWorkExperienceResource extends Resource
                     ->searchable(),
 
                 Tables\Columns\TextColumn::make('start_date')
+                    ->label('Tanggal Mulai Bekerja')
                     ->date('F j, Y')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('end_date')
+                    ->label('Tanggal Berakhir Bekerja')
                     ->date('F j, Y')
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('employee.name'),
+                Tables\Columns\TextColumn::make('employee.name')
+                    ->label('Nama Karyawan'),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('employee_id')

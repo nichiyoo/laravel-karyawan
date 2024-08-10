@@ -157,8 +157,8 @@ class EmployeeFamilyResource extends Resource
     {
         return [
             'index' => Pages\ListEmployeeFamilies::route('/'),
-            'view' => Pages\ViewEmployeeFamily::route('/{record}'),
             'create' => Pages\CreateEmployeeFamily::route('/create'),
+            'view' => Pages\ViewEmployeeFamily::route('/{record}'),
             'edit' => Pages\EditEmployeeFamily::route('/{record}/edit'),
         ];
     }

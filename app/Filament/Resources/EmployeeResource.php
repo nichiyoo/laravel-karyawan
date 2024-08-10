@@ -9,6 +9,7 @@ use App\Enums\MaritalStatus;
 use App\Enums\Relation;
 use App\Enums\Religion;
 use App\Enums\TaxStatus;
+use App\Filament\Exports\EmployeeExporter;
 use App\Filament\Resources\EmployeeResource\Pages;
 use App\Models\Employee;
 use Filament\Forms;
@@ -20,6 +21,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms\Components\Wizard;
 use Filament\Support;
+use Filament\Tables\Actions\ExportAction;
 
 class EmployeeResource extends Resource
 {
@@ -44,8 +46,8 @@ class EmployeeResource extends Resource
                                 ->description('Isi data dengan benar sesuai dokumen terkait.')
                                 ->schema([
                                     Forms\Components\TextInput::make('nik')
-                                        ->label('Nomor Induk Pegawai')
-                                        ->validationAttribute('Nomor Induk Pegawai')
+                                        ->label('Nomor Induk Karyawan')
+                                        ->validationAttribute('Nomor Induk Karyawan')
                                         ->required(),
 
                                     Forms\Components\TextInput::make('ktp_number')
@@ -163,8 +165,8 @@ class EmployeeResource extends Resource
                                         ->required(),
 
                                     Forms\Components\TextInput::make('npwp')
-                                        ->label('Nomor Pajak Wajib Pajak')
-                                        ->validationAttribute('Nomor Pajak Wajib Pajak')
+                                        ->label('Nomor Pokok Wajib Pajak')
+                                        ->validationAttribute('Nomor Pokok Wajib Pajak')
                                         ->required(),
 
                                     Forms\Components\TextInput::make('bpjs_tenaga_kerja')
@@ -217,7 +219,6 @@ class EmployeeResource extends Resource
                                         ->label('Jenis Hubungan')
                                         ->validationAttribute('Jenis Hubungan')
                                         ->options(Relation::class)
-                                        ->disableOptionsWhenSelectedInSiblingRepeaterItems()
                                         ->required()
                                         ->live(),
 
@@ -275,7 +276,7 @@ class EmployeeResource extends Resource
                                     Forms\Components\DatePicker::make('end_date')
                                         ->label('Tanggal Berakhir Bekerja'),
                                 ])
-                                ->itemLabel(fn(array $state): ?string => $state['relation'] ?? 'Pilih Jenis Hubungan')
+                                ->itemLabel(fn(array $state): ?string => $state['company_name'] ?? 'Nama Perusahaan')
                                 ->columns(2),
                         ]),
 
@@ -299,8 +300,8 @@ class EmployeeResource extends Resource
                                         ->required(),
 
                                     Forms\Components\FileUpload::make('file_npwp')
-                                        ->label('File Nomor Pajak Wajib Pajak')
-                                        ->validationAttribute('File Nomor Pajak Wajib Pajak')
+                                        ->label('File Nomor Pokok Wajib Pajak')
+                                        ->validationAttribute('File Nomor Pokok Wajib Pajak')
                                         ->image()
                                         ->imageEditor()
                                         ->required(),
@@ -378,12 +379,25 @@ class EmployeeResource extends Resource
                     ->label('Tempat Lahir')
                     ->searchable(),
 
+                Tables\Columns\TextColumn::make('marital_status')
+                    ->label('Status Pernikahan')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                Tables\Columns\TextColumn::make('religion')
+                    ->label('Agama')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                Tables\Columns\TextColumn::make('blood_type')
+                    ->label('Golongan Darah')
+                    ->badge()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 Tables\Columns\TextColumn::make('tax_status')
                     ->label('Status Pajak')
                     ->badge(),
 
                 Tables\Columns\TextColumn::make('npwp')
-                    ->label('Nomor Pajak Wajib Pajak')
+                    ->label('Nomor Pokok Wajib Pajak')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
@@ -449,8 +463,8 @@ class EmployeeResource extends Resource
     {
         return [
             'index' => Pages\ListEmployees::route('/'),
-            'view' => Pages\ViewEmployee::route('/{record}'),
             'create' => Pages\CreateEmployee::route('/create'),
+            'view' => Pages\ViewEmployee::route('/{record}'),
             'edit' => Pages\EditEmployee::route('/{record}/edit'),
         ];
     }

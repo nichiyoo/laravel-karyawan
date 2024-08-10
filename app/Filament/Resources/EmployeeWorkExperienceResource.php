@@ -115,8 +115,8 @@ class EmployeeWorkExperienceResource extends Resource
     {
         return [
             'index' => Pages\ListEmployeeWorkExperiences::route('/'),
-            'view' => Pages\ViewEmployeeWorkExperience::route('/{record}'),
             'create' => Pages\CreateEmployeeWorkExperience::route('/create'),
+            'view' => Pages\ViewEmployeeWorkExperience::route('/{record}'),
             'edit' => Pages\EditEmployeeWorkExperience::route('/{record}/edit'),
         ];
     }

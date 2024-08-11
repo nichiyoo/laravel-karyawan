@@ -1,41 +1,37 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Livewire\Employee;
 
-use App\Enums\BloodType;
-use App\Enums\Education;
 use App\Enums\Gender;
-use App\Enums\MaritalStatus;
 use App\Enums\Relation;
-use App\Enums\Religion;
+use App\Enums\MaritalStatus;
 use App\Enums\TaxStatus;
-use App\Filament\Exports\EmployeeExporter;
-use App\Filament\Resources\EmployeeResource\Pages;
+use App\Enums\Education;
+use App\Enums\Religion;
+use App\Enums\BloodType;
 use App\Models\Employee;
+use Livewire\Component;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Forms\Concerns\InteractsWithForms;
+
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Forms\Get;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
+use Filament\Forms\Form;
 use Filament\Forms\Components\Wizard;
-use Filament\Support;
-use Filament\Tables\Actions\ExportAction;
 
-class EmployeeResource extends Resource
+class CreateEmployee extends Component implements HasForms
 {
-    protected static ?string $model = Employee::class;
-    protected static ?string $navigationGroup = 'Karyawan';
-    protected static ?string $navigationIcon = 'heroicon-o-user';
-    protected static ?int $navigationSort = 1;
+    use InteractsWithForms;
 
-    public static function getModelLabel(): string
+    public ?array $data = [];
+    public string $title = 'Buat Data Karyawan';
+
+    public function mount(): void
     {
-        return __('Data Karyawan');
+        $this->form->fill();
     }
 
-    public static function form(Form $form): Form
+    public function form(Form $form): Form
     {
         return $form
             ->schema([
@@ -343,134 +339,22 @@ class EmployeeResource extends Resource
                         ]),
                 ]),
             ])
-            ->columns(1);
+            ->columns(1)
+            ->statePath('data')
+            ->model(Employee::class);
     }
 
-    public static function table(Table $table): Table
+    public function create(): void
     {
-        return $table
-            ->columns([
-                Tables\Columns\TextColumn::make('created_at')
-                    ->label('Tanggal Dibuat')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+        $data = $this->form->getState();
+        $record = Employee::create($data);
+        $this->form->model($record)->saveRelationships();
 
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->label('Tanggal Diubah')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-
-                Tables\Columns\TextColumn::make('nik')
-                    ->label('Nomor Induk Pegawai')
-                    ->searchable(),
-
-                Tables\Columns\TextColumn::make('name')
-                    ->label('Nama Lengkap')
-                    ->searchable(),
-
-                Tables\Columns\TextColumn::make('gender')
-                    ->label('Jenis Kelamin')
-                    ->badge(),
-
-                Tables\Columns\TextColumn::make('birthdate')
-                    ->label('Tanggal Lahir')
-                    ->date()
-                    ->sortable(),
-
-                Tables\Columns\TextColumn::make('birthplace')
-                    ->label('Tempat Lahir')
-                    ->searchable(),
-
-                Tables\Columns\TextColumn::make('marital_status')
-                    ->label('Status Pernikahan')
-                    ->toggleable(isToggledHiddenByDefault: true),
-
-                Tables\Columns\TextColumn::make('religion')
-                    ->label('Agama')
-                    ->toggleable(isToggledHiddenByDefault: true),
-
-                Tables\Columns\TextColumn::make('blood_type')
-                    ->label('Golongan Darah')
-                    ->badge()
-                    ->toggleable(isToggledHiddenByDefault: true),
-
-                Tables\Columns\TextColumn::make('tax_status')
-                    ->label('Status Pajak')
-                    ->badge(),
-
-                Tables\Columns\TextColumn::make('npwp')
-                    ->label('Nomor Pokok Wajib Pajak')
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-
-                Tables\Columns\TextColumn::make('bpjs_tenaga_kerja')
-                    ->label('Nomor BPJS Tenaga Kerja')
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-
-                Tables\Columns\TextColumn::make('bpjs_kesehatan')
-                    ->label('Nomor BPJS Kesehatan')
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-
-                Tables\Columns\TextColumn::make('phone_number')
-                    ->label('Nomor Telepon')
-                    ->searchable(),
-            ])
-            ->filters([
-                Tables\Filters\SelectFilter::make('gender')
-                    ->label('Jenis Kelamin')
-                    ->options(Gender::class),
-
-                Tables\Filters\SelectFilter::make('tax_status')
-                    ->label('Status Pajak')
-                    ->options(TaxStatus::class),
-
-                Tables\Filters\SelectFilter::make('marital_status')
-                    ->label('Status Pernikahan')
-                    ->options(MaritalStatus::class),
-
-                Tables\Filters\SelectFilter::make('religion')
-                    ->label('Agama')
-                    ->options(Religion::class),
-
-                Tables\Filters\SelectFilter::make('blood_type')
-                    ->label('Golongan Darah')
-                    ->options(BloodType::class),
-
-                Tables\Filters\SelectFilter::make('tax_status')
-                    ->label('Status Pajak')
-                    ->options(TaxStatus::class),
-            ], layout: Tables\Enums\FiltersLayout::Modal)
-            ->filtersFormWidth(Support\Enums\MaxWidth::TwoExtraLarge)
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
+        $this->emit('refresh');
     }
 
-    public static function getRelations(): array
+    public function render()
     {
-        return [
-            //
-        ];
-    }
-
-    public static function getPages(): array
-    {
-        return [
-            'index' => Pages\ListEmployees::route('/'),
-            'create' => Pages\CreateEmployee::route('/create'),
-            'view' => Pages\ViewEmployee::route('/{record}'),
-            'edit' => Pages\EditEmployee::route('/{record}/edit'),
-        ];
+        return view('livewire.employee.create-employee');
     }
 }

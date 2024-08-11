@@ -52,8 +52,6 @@ return new class extends Migration
             $table->string('file_akta_nikah')->nullable();
             $table->string('file_bpjs_kesehatan')->nullable();
             $table->string('file_bpjs_tenaga_kerja')->nullable();
-
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
         });
     }
 

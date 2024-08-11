@@ -349,8 +349,7 @@ class CreateEmployee extends Component implements HasForms
         $data = $this->form->getState();
         $record = Employee::create($data);
         $this->form->model($record)->saveRelationships();
-
-        $this->emit('refresh');
+        $this->dispatch('open-modal', id: 'success-modal');
     }
 
     public function render()
